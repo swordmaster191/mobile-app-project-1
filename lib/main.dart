@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-//https://www.youtube.com/watch?v=km2P_KQJyO0&list=PL4cUxeGkcC9jLYyp2Aoh6hcWuxFDX6PBJ&index=6
+//https://www.youtube.com/watch?v=ABmqtI7ec7E&list=PL4cUxeGkcC9jLYyp2Aoh6hcWuxFDX6PBJ&index=10
 void main() {
   runApp(MaterialApp(
     home: Home()
@@ -18,13 +18,20 @@ class Home extends StatelessWidget {
       ),
 
       body: Center(
-        child: Text(
+        child:RaisedButton.icon(
+          onPressed: (){},
+          icon: Icon(
+            Icons.mail
+          ),
+          label: Text(
           "Test 123",
           style: TextStyle(
             fontSize: 25.0,
             letterSpacing: 2.0,
             color: Colors.grey[600],
+            ),
           ),
+          color: Colors.amber,
         ),
       ),
       floatingActionButton: FloatingActionButton(
