@@ -8,9 +8,19 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  int incomeTotal = 0;
-  int expenseTotal = 0;
-  //int diff = incomeTotal - expenseTotal;
+  int incomeTotal = 3;
+  int expenseTotal = 1;
+  int diff = 0;
+
+  void setDiff(){
+    diff = (incomeTotal - expenseTotal);
+  }
+
+  @override
+  void initState() {
+    setDiff();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,9 +81,9 @@ class _HomeState extends State<Home> {
             ),
             SizedBox(height: 10.0),
             Text(
-                '123',
+                diff.toStringAsFixed(0),
                 style: TextStyle(
-                    color: Colors.redAccent,
+                    color: diff > 0 ? Colors.lightGreen : Colors.redAccent,
                     fontSize: 28.0,
                     fontWeight: FontWeight.bold
                 )
