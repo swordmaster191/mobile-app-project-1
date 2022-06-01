@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:flutter/material.dart';
 
 class Home extends StatefulWidget {
@@ -12,7 +10,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   int incomeTotal = 0;
   int expenseTotal = 0;
-  int diff = incomeTotal - expenseTotal;
+  //int diff = incomeTotal - expenseTotal;
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +71,7 @@ class _HomeState extends State<Home> {
             ),
             SizedBox(height: 10.0),
             Text(
-                '$diff',
+                '123',
                 style: TextStyle(
                     color: Colors.redAccent,
                     fontSize: 28.0,
@@ -86,9 +84,7 @@ class _HomeState extends State<Home> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          setState(() {
-            incomeTotal += 1;
-          });
+          Navigator.pushNamed(context, '/adddata');
         },
         child:
         Icon(Icons.add),
