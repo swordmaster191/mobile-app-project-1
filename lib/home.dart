@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart' as intl;
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
+  static int incomeTotal = 0;
+  static int expenseTotal = 0;
 
   @override
   State<Home> createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
-  int incomeTotal = 3;
-  int expenseTotal = 1;
-  int diff = 0;
+  String diff = '';
+  final incomeFormatter =  intl.NumberFormat.decimalPattern().format(Home.incomeTotal);
+  final expenseFormatter =  intl.NumberFormat.decimalPattern().format(Home.expenseTotal);
 
   void setDiff(){
-    diff = (incomeTotal - expenseTotal);
+    diff = intl.NumberFormat.decimalPattern().format((Home.incomeTotal - Home.expenseTotal));
   }
 
   @override
@@ -47,7 +50,7 @@ class _HomeState extends State<Home> {
             ),
             SizedBox(height: 10.0),
             Text(
-                '$incomeTotal',
+                '$incomeFormatter',
                 style: TextStyle(
                     color: Colors.lightGreen,
                     fontSize: 28.0,
@@ -64,7 +67,7 @@ class _HomeState extends State<Home> {
             ),
             SizedBox(height: 10.0),
             Text(
-                '$expenseTotal',
+                '$expenseFormatter',
                 style: TextStyle(
                     color: Colors.redAccent,
                     fontSize: 28.0,
@@ -81,9 +84,9 @@ class _HomeState extends State<Home> {
             ),
             SizedBox(height: 10.0),
             Text(
-                diff.toStringAsFixed(0),
+                '$diff',
                 style: TextStyle(
-                    color: diff > 0 ? Colors.lightGreen : Colors.redAccent,
+                    color: (Home.incomeTotal - Home.expenseTotal) > 0 ? Colors.lightGreen : Colors.redAccent,
                     fontSize: 28.0,
                     fontWeight: FontWeight.bold
                 )

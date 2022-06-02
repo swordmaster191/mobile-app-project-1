@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import 'home.dart';
+
+// https://medium.com/swlh/the-simplest-way-to-pass-and-fetch-data-between-stateful-and-stateless-widgets-pages-full-2021-c5dbce8db1db
 class AddData extends StatefulWidget {
   const AddData({Key? key}) : super(key: key);
 
@@ -25,20 +28,11 @@ class _AddDataState extends State<AddData> {
   TextEditingController dateinput = TextEditingController();
   String currentSelectedType = "";
 
-  void getType() async {
-    Future<String> futureString = showTypeCategories(context);
-    if (await futureString != null) {
-      currentSelectedType = await futureString;
-    }
-  }
-
-
   @override
   void initState() {
     dateinput.text = ""; //set the initial value of text field
     super.initState();
   }
-
   @override
   Widget build(BuildContext context) {
     // Build a Form widget using the _formKey created above.
@@ -72,7 +66,7 @@ class _AddDataState extends State<AddData> {
                   // The validator receives the text that the user has entered.
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter the name';
+                      return 'Please enter the name of the transaction';
                     }
                     return null;
                   },
@@ -86,7 +80,7 @@ class _AddDataState extends State<AddData> {
                     )
                 ),
                 SizedBox(height: 10.0),
-                TextField(
+                TextFormField(
                   style: TextStyle(color: Colors.white),
                   cursorColor: Colors.white,
                   controller: dateinput,
@@ -133,15 +127,9 @@ class _AddDataState extends State<AddData> {
                   // The validator receives the text that the user has entered.
                   style: TextStyle(color: Colors.white),
                   cursorColor: Colors.white,
-                  onTap: () {
-                    showTypeCategories(context);
-                    setState(() {
-                      _textEditingController.text = currentSelectedType;
-                    });
-                  },
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter some text';
+                      return 'Please enter the type of your transaction';
                     }
                     return null;
                   },
@@ -198,6 +186,16 @@ class _AddDataState extends State<AddData> {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('Processing Data')),
                         );
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => Home(
+                              passedIncome: 1,
+                              passedExpense: 2,
+                            ),),)
+                        Home.incomeTotal = 420;
+                        Home.expenseTotal = 69;
+
                       }
                     },
                     child: const Text('Submit'),
@@ -205,54 +203,5 @@ class _AddDataState extends State<AddData> {
               ],
             ),),),),
     );
-  }
-
-  Future<String> showTypeCategories(context) async {
-    var result = await showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return SimpleDialog(
-          backgroundColor: Colors.grey[900],
-          shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          title: Text(
-            'Select type',
-            style: TextStyle(color: Colors.grey),
-          ),
-          children: <Widget>[
-            Column(
-              children: List.generate(
-                type.length,
-                    (index) {
-                  return SimpleDialogOption(
-                    child: ListTile(
-                      leading: Icon(
-                          Icons.bookmark,
-                        color: Colors.white,
-                      ),
-                      title: Text(
-                          type[index],
-                          style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.pop(context, type[index]);
-                    },
-                  );
-                },
-              ),
-            ),
-          ],
-        );
-      },
-    );
-
-    switch (result) {
-      case 'Income':
-        return "Income";
-      case 'Expense':
-        return "Expense";
-    }
-    return "";
   }
 }
