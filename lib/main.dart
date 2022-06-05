@@ -8,7 +8,6 @@ void main() {
       initialRoute: '/home',
       routes: {
         '/home': (context) => Home(),
-        '/adddata': (context) => AddData(),
       }
   ));
 }

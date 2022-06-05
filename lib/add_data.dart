@@ -189,12 +189,8 @@ class _AddDataState extends State<AddData> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => Home(
-                              passedIncome: 1,
-                              passedExpense: 2,
-                            ),),)
-                        Home.incomeTotal = 420;
-                        Home.expenseTotal = 69;
+                            builder: (context) => Home(
+                            ),),);
 
                       }
                     },

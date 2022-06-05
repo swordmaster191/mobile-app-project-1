@@ -1,33 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' as intl;
+import 'package:lottie/lottie.dart';
+import 'dart:convert';
+
+import 'ExpandableFab.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
-  static int incomeTotal = 0;
-  static int expenseTotal = 0;
-
   @override
   State<Home> createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
   String diff = '';
-  final incomeFormatter =  intl.NumberFormat.decimalPattern().format(Home.incomeTotal);
-  final expenseFormatter =  intl.NumberFormat.decimalPattern().format(Home.expenseTotal);
+  int expenseTotal = 0;
+  int expenseGoal = 0;
+  static const _actionTitles = ['Add Entry', 'View Entries'];
 
-  void setDiff(){
-    diff = intl.NumberFormat.decimalPattern().format((Home.incomeTotal - Home.expenseTotal));
+  //final incomeFormatter =  intl.NumberFormat.decimalPattern().format(expenseTotal);
+  //final expenseFormatter =  intl.NumberFormat.decimalPattern().format(expenseGoal);
+
+  void _showAction(BuildContext context, int index) {
+    showDialog<void>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          content: Text(_actionTitles[index]),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('CLOSE'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   void initState() {
-    setDiff();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset : false,
       backgroundColor: Colors.grey[900],
       appBar: AppBar(
         title: Text("Dejariana"),
@@ -41,68 +59,366 @@ class _HomeState extends State<Home> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text(
-                'TOTAL INCOME',
-                style: TextStyle(
-                  color: Colors.grey,
-                  letterSpacing: 2.0,
-                )
-            ),
-            SizedBox(height: 10.0),
-            Text(
-                '$incomeFormatter',
-                style: TextStyle(
-                    color: Colors.lightGreen,
-                    fontSize: 28.0,
-                    fontWeight: FontWeight.bold
-                )
-            ),
-            SizedBox(height: 40.0),
-            Text(
-                'TOTAL EXPENSE',
-                style: TextStyle(
-                  color: Colors.grey,
-                  letterSpacing: 2.0,
-                )
-            ),
-            SizedBox(height: 10.0),
-            Text(
-                '$expenseFormatter',
-                style: TextStyle(
-                    color: Colors.redAccent,
-                    fontSize: 28.0,
-                    fontWeight: FontWeight.bold
-                )
-            ),
-            SizedBox(height: 40.0),
-            Text(
-                'NET DIFFERENCES',
-                style: TextStyle(
-                  color: Colors.grey,
-                  letterSpacing: 2.0,
-                )
-            ),
-            SizedBox(height: 10.0),
-            Text(
-                '$diff',
-                style: TextStyle(
-                    color: (Home.incomeTotal - Home.expenseTotal) > 0 ? Colors.lightGreen : Colors.redAccent,
-                    fontSize: 28.0,
-                    fontWeight: FontWeight.bold
-                )
-            ),
 
+            Lottie.asset(
+                'assets/thumbsup.json',
+              repeat: false,
+
+            ),
+            Center(
+              child: Column(
+                  children: <Widget>[
+
+                    Text(
+                    'Great job!',
+                    style: TextStyle(
+                        color: Colors.green,
+                        fontSize: 40.0,
+                        fontWeight: FontWeight.bold
+                    )
+                ),
+                    SizedBox(height: 10.0),
+                Text(
+                    'You are currently on track for your goal!',
+                    style: TextStyle(
+                        color: Colors.grey[500],
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.bold
+                    )
+                ),
+              ]
+              ),
+            ),
+            Divider(
+              height: 50.0,
+              color: Colors.grey[800],
+            ),
+            Text(
+                'TOTAL EXPENSES',
+                style: TextStyle(
+                  color: Colors.grey,
+                  letterSpacing: 2.0,
+                )
+            ),
+            SizedBox(height: 10.0),
+            Text(
+                '$expenseTotal',
+                style: TextStyle(
+                    color: Colors.amberAccent[200],
+                    fontSize: 28.0,
+                    fontWeight: FontWeight.bold
+                )
+            ),
+            SizedBox(height: 20.0),
+            Text(
+                'CURRENT GOAL',
+                style: TextStyle(
+                  color: Colors.grey,
+                  letterSpacing: 2.0,
+                )
+            ),
+            SizedBox(height: 10.0),
+            Text(
+                '$expenseGoal',
+                style: TextStyle(
+                    color: Colors.amberAccent[200],
+                    fontSize: 28.0,
+                    fontWeight: FontWeight.bold
+                )
+            ),
           ],
         ),
       ),
+      /*
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.pushNamed(context, '/adddata');
+        onPressed: (){
+          showDataAlert();
         },
         child:
-        Icon(Icons.add),
-        backgroundColor: Colors.blue,
+          Icon(Icons.menu),
+          backgroundColor: Colors.blue,
+      ),*/
+      floatingActionButton: ExpandableFab(
+        distance: 75,
+        children: [
+          ActionButton(
+            onPressed: () async{
+              await addDataAlert();
+              setState((){});
+            },
+              icon: const Icon(Icons.add),
+          ),
+          ActionButton(
+            onPressed: () async{
+              await editGoalAlert();
+              setState((){});
+            },
+            icon: const Icon(Icons.edit),
+          ),
+        ],
+      ),
+
+    );
+  }
+  Future addDataAlert() {
+    final _formKey = GlobalKey<FormState>();
+    return showDialog(
+        context: context,
+        builder: (context) => StatefulBuilder(builder: (context, setState) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(
+                Radius.circular(
+                  20.0,
+                ),
+              ),
+            ),
+            contentPadding: EdgeInsets.only(
+              top: 10.0,
+            ),
+            title: Text(
+              "Log expenses",
+              style: TextStyle(fontSize: 24.0),
+            ),
+            content:
+            Container(
+              height: 270,
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        " Add expense amount",
+                      ),
+                    ),
+                    Container(
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Form(
+                        key: _formKey,
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              TextFormField(
+                                onSaved: (String? value){
+                                  if (value != null){
+                                    expenseTotal += int.parse(value);
+                                  }
+                                  },
+                                keyboardType: TextInputType.number,
+                                decoration: const InputDecoration(
+                                    border: OutlineInputBorder(),
+                                    hintText: 'Enter your amount here',
+                                    labelText: 'Amount'),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter a value';
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    )
+                    ),
+                    Container(
+                      width: double.infinity,
+                      height: 60,
+                      padding: const EdgeInsets.all(8.0),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
+                            _formKey.currentState?.save();
+                            print(expenseTotal);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Saved!')),
+                            );
+                            Navigator.of(context).pop();
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.green,
+                          // fixedSize: Size(250, 50),
+                        ),
+                        child: Text(
+                          "Submit",
+                        ),
+                      ),
+                    ),
+                    Container(
+                      width: double.infinity,
+                      height: 60,
+                      padding: const EdgeInsets.all(8.0),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.redAccent,
+                          // fixedSize: Size(250, 50),
+                        ),
+                        child: Text(
+                          "Cancel",
+                        ),
+                      ),
+                    ),
+                    /*
+                    Container(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text('Note'),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        'The data will only be used to calculate the current expenses, no data will be logged or linked to your device or ID.',
+                        style: TextStyle(fontSize: 12),
+                      ),
+                    ),*/
+                  ],
+                ),
+              ),
+            ),
+          )
+    ),
+    );
+  }
+  Future editGoalAlert() {
+    final _formKey = GlobalKey<FormState>();
+    return showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(builder: (context, setState) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(
+            Radius.circular(
+              20.0,
+            ),
+          ),
+        ),
+        contentPadding: EdgeInsets.only(
+          top: 10.0,
+        ),
+        title: Text(
+          "Edit spending goal",
+          style: TextStyle(fontSize: 24.0),
+        ),
+        content:
+        Container(
+          height: 270,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    " Edit value",
+                  ),
+                ),
+                Container(
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Form(
+                        key: _formKey,
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              TextFormField(
+                                onSaved: (String? value){
+                                  if (value != null){
+                                    expenseTotal += int.parse(value);
+                                  }
+                                },
+                                keyboardType: TextInputType.number,
+                                decoration: const InputDecoration(
+                                    border: OutlineInputBorder(),
+                                    hintText: 'Enter your goal here',
+                                    labelText: 'Amount'),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter a value';
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    )
+                ),
+                Container(
+                  width: double.infinity,
+                  height: 60,
+                  padding: const EdgeInsets.all(8.0),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        _formKey.currentState?.save();
+                        print(expenseTotal);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Saved!')),
+                        );
+                        Navigator.of(context).pop();
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.green,
+                      // fixedSize: Size(250, 50),
+                    ),
+                    child: Text(
+                      "Submit",
+                    ),
+                  ),
+                ),
+                Container(
+                  width: double.infinity,
+                  height: 60,
+                  padding: const EdgeInsets.all(8.0),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.redAccent,
+                      // fixedSize: Size(250, 50),
+                    ),
+                    child: Text(
+                      "Cancel",
+                    ),
+                  ),
+                ),
+                /*
+                    Container(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text('Note'),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        'The data will only be used to calculate the current expenses, no data will be logged or linked to your device or ID.',
+                        style: TextStyle(fontSize: 12),
+                      ),
+                    ),*/
+              ],
+            ),
+          ),
+        ),
+      )
       ),
     );
   }
 }
+
+
+
