@@ -12,29 +12,84 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  String diff = '';
-  static int expenseTotal = 0;
-  static int expenseGoal = 0;
-  static const _actionTitles = ['Add Entry', 'View Entries'];
+  int expenseTotal = 0;
+  int expenseGoal = 0;
+  String animationPath = "";
+  String title = "This is the default value";
+  String desc = "Something is wrong with the code I assume :(";
+  LottieBuilder happy = Lottie.asset(
+    "assets/thumbsup.json",
+    repeat: true,
+  );
+  LottieBuilder neutral = Lottie.asset(
+    "assets/warning.json",
+    repeat: true,
+  );
+  LottieBuilder sad = Lottie.asset(
+    "assets/sad.json",
+    repeat: true,
+  );
+  static const _goalTitle = ['Great job!', 'Watch out!', 'Oh no!'];
+  static const _goalDesc = ['You are currently on track for your goal!', 'Try limiting your expenses!', 'You have went over your goal :('];
 
-  final expenseTotalFormatter =  intl.NumberFormat.decimalPattern().format(expenseTotal);
-  final expenseGoalFormatter =  intl.NumberFormat.decimalPattern().format(expenseGoal);
+  var expenseTotalFormatter;
+  var expenseGoalFormatter;
+  LottieBuilder updateState(){
+    expenseTotalFormatter = intl.NumberFormat.decimalPattern().format(expenseTotal).toString();
+    expenseGoalFormatter = intl.NumberFormat.decimalPattern().format(expenseGoal).toString();
 
-  void _showAction(BuildContext context, int index) {
-    showDialog<void>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          content: Text(_actionTitles[index]),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('CLOSE'),
-            ),
-          ],
-        );
-      },
-    );
+    if(expenseTotal > expenseGoal){
+      title = _goalTitle.elementAt(2);
+      desc = _goalDesc.elementAt(2);
+      return sad;
+    }
+    else if(expenseTotal/expenseGoal >= 0.50){
+      title = _goalTitle.elementAt(1);
+      desc = _goalDesc.elementAt(1);
+      return neutral;
+    }
+    else{
+      title = _goalTitle.elementAt(0);
+      desc = _goalDesc.elementAt(0);
+      return happy;
+    }
+
+
+  }
+
+  Text getTitleWithFormat(){
+    if(expenseTotal > expenseGoal){
+      return Text(
+          '$title',
+          style: TextStyle(
+              color: Colors.red,
+              fontSize: 40.0,
+              fontWeight: FontWeight.bold
+          )
+      );
+    }
+    else if(expenseTotal/expenseGoal >= 0.5){
+      return Text(
+          '$title',
+          style: TextStyle(
+              color: Colors.orangeAccent,
+              fontSize: 40.0,
+              fontWeight: FontWeight.bold
+          )
+      );
+    }
+    else{
+      return Text(
+          '$title',
+          style: TextStyle(
+              color: Colors.green,
+              fontSize: 40.0,
+              fontWeight: FontWeight.bold
+          )
+      );
+    }
+
+
   }
 
   @override
@@ -59,26 +114,15 @@ class _HomeState extends State<Home> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-
-            Lottie.asset(
-                'assets/thumbsup.json',
-              repeat: false,
-
-            ),
+            updateState(),
+            SizedBox(height: 10.0),
             Center(
               child: Column(
                   children: <Widget>[
-                    Text(
-                    'Great job!',
-                    style: TextStyle(
-                        color: Colors.green,
-                        fontSize: 40.0,
-                        fontWeight: FontWeight.bold
-                    )
-                ),
+                    getTitleWithFormat(),
                     SizedBox(height: 10.0),
                 Text(
-                    'You are currently on track for your goal!',
+                    '$desc',
                     style: TextStyle(
                         color: Colors.grey[500],
                         fontSize: 16.0,
