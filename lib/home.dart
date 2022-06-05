@@ -13,12 +13,12 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   String diff = '';
-  int expenseTotal = 0;
-  int expenseGoal = 0;
+  static int expenseTotal = 0;
+  static int expenseGoal = 0;
   static const _actionTitles = ['Add Entry', 'View Entries'];
 
-  //final incomeFormatter =  intl.NumberFormat.decimalPattern().format(expenseTotal);
-  //final expenseFormatter =  intl.NumberFormat.decimalPattern().format(expenseGoal);
+  final expenseTotalFormatter =  intl.NumberFormat.decimalPattern().format(expenseTotal);
+  final expenseGoalFormatter =  intl.NumberFormat.decimalPattern().format(expenseGoal);
 
   void _showAction(BuildContext context, int index) {
     showDialog<void>(
@@ -68,7 +68,6 @@ class _HomeState extends State<Home> {
             Center(
               child: Column(
                   children: <Widget>[
-
                     Text(
                     'Great job!',
                     style: TextStyle(
@@ -102,7 +101,7 @@ class _HomeState extends State<Home> {
             ),
             SizedBox(height: 10.0),
             Text(
-                '$expenseTotal',
+                '$expenseTotalFormatter',
                 style: TextStyle(
                     color: Colors.amberAccent[200],
                     fontSize: 28.0,
@@ -119,7 +118,7 @@ class _HomeState extends State<Home> {
             ),
             SizedBox(height: 10.0),
             Text(
-                '$expenseGoal',
+                '$expenseGoalFormatter',
                 style: TextStyle(
                     color: Colors.amberAccent[200],
                     fontSize: 28.0,
@@ -305,7 +304,7 @@ class _HomeState extends State<Home> {
           top: 10.0,
         ),
         title: Text(
-          "Edit spending goal",
+          "Edit expenses goal",
           style: TextStyle(fontSize: 24.0),
         ),
         content:
@@ -336,9 +335,10 @@ class _HomeState extends State<Home> {
                               TextFormField(
                                 onSaved: (String? value){
                                   if (value != null){
-                                    expenseTotal += int.parse(value);
+                                    expenseGoal = int.parse(value);
                                   }
                                 },
+                                initialValue: expenseGoal.toString(),
                                 keyboardType: TextInputType.number,
                                 decoration: const InputDecoration(
                                     border: OutlineInputBorder(),
@@ -365,9 +365,8 @@ class _HomeState extends State<Home> {
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         _formKey.currentState?.save();
-                        print(expenseTotal);
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Saved!')),
+                          const SnackBar(content: Text('Goal updated!')),
                         );
                         Navigator.of(context).pop();
                       }
