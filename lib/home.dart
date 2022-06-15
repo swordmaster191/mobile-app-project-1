@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:lottie/lottie.dart';
 import 'dart:convert';
@@ -181,7 +182,7 @@ class _HomeState extends State<Home> {
           Icon(Icons.menu),
           backgroundColor: Colors.blue,
       ),*/
-      floatingActionButton: ExpandableFab(
+      /*floatingActionButton: ExpandableFab(
         distance: 75,
         children: [
           ActionButton(
@@ -200,7 +201,56 @@ class _HomeState extends State<Home> {
           ),
         ],
       ),
-
+       */
+      floatingActionButton: SpeedDial(
+        spacing: 12,
+        spaceBetweenChildren: 12,
+        animatedIcon: AnimatedIcons.menu_close,
+        overlayColor: Colors.black,
+        overlayOpacity: 0.95,
+        children: [
+          SpeedDialChild(
+            child: Icon(Icons.list_alt_sharp),
+            backgroundColor: Colors.grey,
+            foregroundColor: Colors.white,
+            label: 'Manage/View entries',
+            onTap: () async{
+              await editGoalAlert();
+              setState((){});
+            },
+          ),
+          SpeedDialChild(
+            child: Icon(Icons.edit),
+            backgroundColor: Colors.amberAccent[200],
+            foregroundColor: Colors.white,
+            label: 'Set spending goal',
+            onTap: () async{
+              await editGoalAlert();
+              setState((){});
+            },
+          ),
+          SpeedDialChild(
+            child: Icon(Icons.account_balance_wallet_sharp),
+            backgroundColor: Colors.redAccent[200],
+            foregroundColor: Colors.white,
+            label: 'Add an expense',
+            onTap: () async{
+              await addDataAlert();
+              setState((){});
+            },
+          ),
+          SpeedDialChild(
+            child: Icon(Icons.account_balance_sharp),
+            backgroundColor: Colors.green,
+            foregroundColor: Colors.white,
+            label: 'Add an income',
+            onTap: () async{
+              await addDataAlert();
+              setState((){});
+            },
+          )
+        ],
+      ),
     );
   }
   Future addDataAlert() {
@@ -219,7 +269,7 @@ class _HomeState extends State<Home> {
               top: 10.0,
             ),
             title: Text(
-              "Log expenses",
+              "Add an expense",
               style: TextStyle(fontSize: 24.0),
             ),
             content:
@@ -269,7 +319,7 @@ class _HomeState extends State<Home> {
                           ),
                         ),
                       ),
-                    )
+                    ),
                     ),
                     Container(
                       width: double.infinity,
