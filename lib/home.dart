@@ -456,9 +456,6 @@ class _HomeState extends State<Home> {
                             _expenseDatabase.add([dateData, categoryData, amountData]);
                             print(_expenseDatabase);
 
-
-
-                            //TODO: Save to a list
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text('Saved!')),
                             );
@@ -480,6 +477,7 @@ class _HomeState extends State<Home> {
                       padding: const EdgeInsets.all(8.0),
                       child: ElevatedButton(
                         onPressed: () {
+                          selectedValue = "";
                           Navigator.of(context).pop();
                         },
                         style: ElevatedButton.styleFrom(
