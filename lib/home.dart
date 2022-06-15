@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:intl/intl.dart' as intl;
+import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 import 'dart:convert';
 
@@ -16,6 +17,7 @@ class _HomeState extends State<Home> {
   int expenseTotal = 0;
   int expenseGoal = 0;
   String animationPath = "";
+  String? selectedValue = null;
   String title = "This is the default value";
   String desc = "Something is wrong with the code I assume :(";
   LottieBuilder happy = Lottie.asset(
@@ -30,9 +32,10 @@ class _HomeState extends State<Home> {
     "assets/sad.json",
     repeat: true,
   );
+  List<List<String>> _expenseDatabase = [];
   static const _goalTitle = ['Great job!', 'Watch out!', 'Oh no!'];
   static const _goalDesc = ['You are currently on track for your goal!', 'Try limiting your expenses!', 'You have went over your goal :('];
-
+  TextEditingController dateinput = TextEditingController();
   var expenseTotalFormatter;
   var expenseGoalFormatter;
   LottieBuilder updateState(){
@@ -56,6 +59,25 @@ class _HomeState extends State<Home> {
     }
 
 
+  }
+  List<DropdownMenuItem<String>> get dropdownItems{
+    List<DropdownMenuItem<String>> menuItems = [
+      DropdownMenuItem(child: Text("Food"),value: "Food"),
+      DropdownMenuItem(child: Text("Utilities"),value: "Utilities"),
+      DropdownMenuItem(child: Text("Insurance"),value: "Insurance"),
+      DropdownMenuItem(child: Text("Medical"),value: "Medical"),
+      DropdownMenuItem(child: Text("Saving & Investment"),value: "Saving & Investment"),
+      DropdownMenuItem(child: Text("Personal Spending"),value: "Personal Spending"),
+    ];
+    return menuItems;
+  }
+
+  List<DropdownMenuItem<String>> get dropdownIncome{
+    List<DropdownMenuItem<String>> menuItems = [
+      DropdownMenuItem(child: Text("Salary"),value: "Salary"),
+      DropdownMenuItem(child: Text("Personal Savings"),value: "Personal Savings"),
+    ];
+    return menuItems;
   }
 
   Text getTitleWithFormat(){
@@ -173,35 +195,6 @@ class _HomeState extends State<Home> {
           ],
         ),
       ),
-      /*
-      floatingActionButton: FloatingActionButton(
-        onPressed: (){
-          showDataAlert();
-        },
-        child:
-          Icon(Icons.menu),
-          backgroundColor: Colors.blue,
-      ),*/
-      /*floatingActionButton: ExpandableFab(
-        distance: 75,
-        children: [
-          ActionButton(
-            onPressed: () async{
-              await addDataAlert();
-              setState((){});
-            },
-              icon: const Icon(Icons.add),
-          ),
-          ActionButton(
-            onPressed: () async{
-              await editGoalAlert();
-              setState((){});
-            },
-            icon: const Icon(Icons.edit),
-          ),
-        ],
-      ),
-       */
       floatingActionButton: SpeedDial(
         spacing: 12,
         spaceBetweenChildren: 12,
@@ -255,6 +248,12 @@ class _HomeState extends State<Home> {
   }
   Future addDataAlert() {
     final _formKey = GlobalKey<FormState>();
+    final _formKey2 = GlobalKey<FormState>();
+    final _formKey3 = GlobalKey<FormState>();
+    String categoryData = "";
+    String amountData = "";
+    String dateData = "";
+
     return showDialog(
         context: context,
         builder: (context) => StatefulBuilder(builder: (context, setState) => AlertDialog(
@@ -274,7 +273,7 @@ class _HomeState extends State<Home> {
             ),
             content:
             Container(
-              height: 270,
+              height: 490,
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
@@ -300,7 +299,7 @@ class _HomeState extends State<Home> {
                               TextFormField(
                                 onSaved: (String? value){
                                   if (value != null){
-                                    expenseTotal += int.parse(value);
+                                    amountData = value;
                                   }
                                   },
                                 keyboardType: TextInputType.number,
@@ -321,15 +320,145 @@ class _HomeState extends State<Home> {
                       ),
                     ),
                     ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        " Select category"
+                      ),
+                    ),
+                    Container(
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Form(
+                          key: _formKey2,
+                          child: SingleChildScrollView(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                DropdownButtonFormField(
+                                  decoration: const InputDecoration(
+                                      border: OutlineInputBorder(),
+                                      hintText: 'Select the category here',
+                                      labelText: 'Category'),
+                                  items: dropdownItems,
+                                  value: selectedValue,
+                                  onChanged: (String? newValue) {
+                                    setState(() {
+                                      selectedValue = newValue!;
+                                    });
+                                  },
+                                  onSaved: (String? value){
+                                    if (value != null){
+                                      categoryData = value;
+                                    }
+                                  },
+                                  validator: (value) {
+                                    if (selectedValue == null) {
+                                      return 'Please enter a value';
+                                    }
+                                    return null;
+                                  },
+
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                          " Date of Transaction"
+                      ),
+                    ),
+                    Container(
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Form(
+                          key: _formKey3,
+                          child: SingleChildScrollView(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                TextFormField(
+                                  decoration: const InputDecoration(
+                                      border: OutlineInputBorder(),
+                                      hintText: 'Enter the date here',
+                                      labelText: 'Date'),
+                                  style: TextStyle(color: Colors.black),
+                                  cursorColor: Colors.black,
+                                  controller: dateinput,
+                                  //editing controller of this TextField
+                                  readOnly: true,
+                                  onSaved: (String? value){
+                                    if (value != null){
+                                      dateData = value;
+                                    }
+                                  },
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter a value';
+                                    }
+                                    return null;
+                                  },
+                                  //set it true, so that user will not able to edit text
+                                  onTap: () async {
+                                    DateTime? pickedDate = await showDatePicker(
+                                        context: context,
+                                        initialDate: DateTime.now(),
+                                        firstDate: DateTime(2000),
+                                        //DateTime.now() - not to allow to choose before today.
+                                        lastDate: DateTime(2101)
+                                    );
+
+                                    if (pickedDate != null) {
+                                      print(
+                                          pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
+                                      String formattedDate = DateFormat('yyyy-MM-dd').format(
+                                          pickedDate);
+                                      print(
+                                          formattedDate); //formatted date output using intl package =>  2021-03-16
+                                      //you can implement different kind of Date Format here according to your requirement
+
+                                      setState(() {
+                                        dateinput.text =
+                                            formattedDate; //set output date to TextField value.
+                                      });
+                                    } else {
+                                      print("Date is not selected");
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+
+
+
                     Container(
                       width: double.infinity,
                       height: 60,
                       padding: const EdgeInsets.all(8.0),
                       child: ElevatedButton(
                         onPressed: () {
-                          if (_formKey.currentState!.validate()) {
+                          if (_formKey.currentState!.validate() && _formKey2.currentState!.validate() && _formKey3.currentState!.validate()) {
                             _formKey.currentState?.save();
-                            print(expenseTotal);
+                            _formKey2.currentState?.save();
+                            _formKey3.currentState?.save();
+
+                            selectedValue = "";
+
+                            _expenseDatabase.add([dateData, categoryData, amountData]);
+                            print(_expenseDatabase);
+
+
+
+                            //TODO: Save to a list
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text('Saved!')),
                             );
@@ -362,18 +491,6 @@ class _HomeState extends State<Home> {
                         ),
                       ),
                     ),
-                    /*
-                    Container(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text('Note'),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        'The data will only be used to calculate the current expenses, no data will be logged or linked to your device or ID.',
-                        style: TextStyle(fontSize: 12),
-                      ),
-                    ),*/
                   ],
                 ),
               ),
@@ -384,6 +501,8 @@ class _HomeState extends State<Home> {
   }
   Future editGoalAlert() {
     final _formKey = GlobalKey<FormState>();
+    final _formKey2 = GlobalKey<FormState>();
+    final _formKey3 = GlobalKey<FormState>();
     return showDialog(
       context: context,
       builder: (context) => StatefulBuilder(builder: (context, setState) => AlertDialog(
@@ -491,18 +610,6 @@ class _HomeState extends State<Home> {
                     ),
                   ),
                 ),
-                /*
-                    Container(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text('Note'),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        'The data will only be used to calculate the current expenses, no data will be logged or linked to your device or ID.',
-                        style: TextStyle(fontSize: 12),
-                      ),
-                    ),*/
               ],
             ),
           ),
