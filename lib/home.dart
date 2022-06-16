@@ -16,6 +16,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   int expenseTotal = 0;
+  int incomeTotal = 0;
   int expenseGoal = 0;
   String animationPath = "";
   String title = "This is the default value";
@@ -45,9 +46,11 @@ class _HomeState extends State<Home> {
   static const _goalDesc = ['You are currently on track for your goal!', 'Try limiting your expenses!', 'You have went over your goal :('];
   TextEditingController dateinput = TextEditingController();
   var expenseTotalFormatter;
+  var incomeTotalFormatter;
   var expenseGoalFormatter;
   LottieBuilder updateState(){
     expenseTotalFormatter = intl.NumberFormat.decimalPattern().format(expenseTotal).toString();
+    incomeTotalFormatter = intl.NumberFormat.decimalPattern().format(incomeTotal).toString();
     expenseGoalFormatter = intl.NumberFormat.decimalPattern().format(expenseGoal).toString();
 
     if(expenseTotal > expenseGoal){
@@ -66,6 +69,19 @@ class _HomeState extends State<Home> {
       return happy;
     }
   }
+
+  void updateNumber(){
+    const initialValue = 0;
+    final incomeResult = incomeData.allIncome.fold<int>(
+        initialValue, (previousValue, element) => previousValue + int.parse(element.amount));
+    incomeTotal = incomeResult;
+
+    final expenseResult = expenseData.allExpense.fold<int>(
+        initialValue, (previousValue, element) => previousValue + int.parse(element.amount));
+    expenseTotal = expenseResult;
+
+  }
+  
 
 
   List<DropdownMenuItem<String>> get dropdownItems{
@@ -182,7 +198,7 @@ class _HomeState extends State<Home> {
             ),
             SizedBox(height: 10.0),
             Text(
-                '$expenseTotalFormatter',
+                '$incomeTotalFormatter',
                 style: TextStyle(
                     color: Colors.amberAccent[200],
                     fontSize: 28.0,
@@ -238,8 +254,9 @@ class _HomeState extends State<Home> {
             backgroundColor: Colors.grey,
             foregroundColor: Colors.white,
             label: 'View expense entries',
-            onTap: () {
-              Navigator.pushNamed(context, '/expenseData');
+            onTap: () async{
+              await Navigator.pushNamed(context, '/expenseData');
+              setState((){});
             },
           ),
           SpeedDialChild(
@@ -247,8 +264,9 @@ class _HomeState extends State<Home> {
             backgroundColor: Colors.grey,
             foregroundColor: Colors.white,
             label: 'View income entries',
-            onTap: () {
-              Navigator.pushNamed(context, '/incomeData');
+            onTap: () async{
+              await Navigator.pushNamed(context, '/incomeData');
+              setState((){});
             },
           ),
           SpeedDialChild(
@@ -495,6 +513,8 @@ class _HomeState extends State<Home> {
 
                             expenseData.allExpense.add(UserData(date: dateData, amount: amountData, category: categoryData));
                             print(expenseData.allExpense.toList());
+
+                            updateNumber();
 
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(content: Text('Saved!')),
@@ -748,6 +768,7 @@ class _HomeState extends State<Home> {
 
                         incomeData.allIncome.add(UserData(date: dateData, amount: amountData, category: categoryData));
                         print(incomeData.allIncome.toList());
+                        updateNumber();
 
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('Saved!')),

@@ -66,6 +66,7 @@ class _ViewExpenseDataState extends State<ViewExpenseData> {
     );
   }
 
+
   List<DataColumn> getColumns(List<String> columns) {
     return columns.map((String column) {
 
@@ -109,9 +110,9 @@ class _ViewExpenseDataState extends State<ViewExpenseData> {
     );
 
     setState(() => datas = datas.map((data) {
-      final isEditedUser = data == editData;
+      final isEditedData = data == editData;
 
-      return isEditedUser ? data.copy(amount: amount) : data;
+      return isEditedData ? data.copy(amount: amount) : data;
     }).toList());
   }
 
@@ -137,7 +138,7 @@ class _ViewExpenseDataState extends State<ViewExpenseData> {
           compareString(ascending, data1.amount, data2.amount));
     } else if (columnIndex == 2) {
       datas.sort((data1, data2) =>
-          compareString(ascending, '${data1.category}', '${data2.category}'));
+          compareString(ascending, data1.category, data2.category));
     }
     setState(() {
       this.sortColumnIndex = columnIndex;
